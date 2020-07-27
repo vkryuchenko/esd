@@ -1,2 +1,2 @@
-# esd
+# ESD
 Extremely simple DNS
