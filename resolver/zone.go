@@ -40,7 +40,6 @@ func (z *Zone) parseQuery(m *dns.Msg) {
 		log.Printf("Query %s for %s\n", questionType, q.Name)
 		points := []string{}
 		for _, record := range z.Records {
-			log.Println(record.Name)
 			if q.Name != record.Name {
 				continue
 			}
@@ -60,6 +59,7 @@ func (z *Zone) parseQuery(m *dns.Msg) {
 				}
 			}
 		} else {
+			log.Println("Points not found")
 			m.Answer = z.AskParent(q.Name, q.Qtype)
 		}
 	}
