@@ -8,10 +8,10 @@ import (
 )
 
 type AppConfig struct {
-	Listen    string          `yaml:"listen"`
-	Protocol  string          `yaml:"protocol"`
-	ParentDNS []string        `yaml:"parentDns"`
-	Zones     []resolver.Zone `yaml:"zones"`
+	Listen   string          `yaml:"listen"`
+	Protocol string          `yaml:"protocol"`
+	Parent   resolver.Parent `yaml:"parent"`
+	Zones    []resolver.Zone `yaml:"zones"`
 }
 
 func (ac *AppConfig) Read(filePath string) error {
@@ -36,9 +36,9 @@ func (ac *AppConfig) normalizeZones(zones []resolver.Zone) []resolver.Zone {
 	var normalizedZones []resolver.Zone
 	for _, zone := range zones {
 		nZ := resolver.Zone{
-			Root:      zone.Root,
-			ParentDNS: zone.ParentDNS,
-			Records:   []resolver.Record{},
+			Root:    zone.Root,
+			Parent:  zone.Parent,
+			Records: []resolver.Record{},
 		}
 		if !strings.HasSuffix(zone.Root, ".") {
 			nZ.Root = zone.Root + "."
@@ -54,8 +54,8 @@ func (ac *AppConfig) normalizeZones(zones []resolver.Zone) []resolver.Zone {
 			}
 			nZ.Records = append(nZ.Records, nR)
 		}
-		if len(nZ.ParentDNS) < 1 {
-			nZ.ParentDNS = ac.ParentDNS
+		if len(nZ.Parent.Servers) < 1 {
+			nZ.Parent = ac.Parent
 		}
 		normalizedZones = append(normalizedZones, nZ)
 	}

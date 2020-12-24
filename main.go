@@ -19,9 +19,9 @@ func main() {
 		log.Fatal(err)
 	}
 	defaultZone := resolver.Zone{
-		Root:      ".",
-		ParentDNS: appConfig.ParentDNS,
-		Records:   nil,
+		Root:    ".",
+		Parent:  appConfig.Parent,
+		Records: nil,
 	}
 	appConfig.Zones = append(appConfig.Zones, defaultZone)
 	log.Println(resolver.Start(appConfig.Listen, appConfig.Protocol, appConfig.Zones))

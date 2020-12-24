@@ -1,8 +1,10 @@
 listen: ":5335"
 protocol: "udp"
-parentDns:
-  - "1.1.1.1:53"
-  - "8.8.4.4:53"
+parent:
+  timeout: 1
+  servers:
+    - "1.1.1.1:53"
+    - "8.8.4.4:53"
 zones:
   - root: "example.com"
     records:

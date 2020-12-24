@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+type Parent struct {
+	Timeout uint64   `yaml:"timeout"`
+	Servers []string `yaml:"servers"`
+}
+
 type Record struct {
 	Name    string   `yaml:"name"`
 	Type    string   `yaml:"type"`
@@ -13,9 +18,9 @@ type Record struct {
 }
 
 type Zone struct {
-	Root      string   `yaml:"root"`
-	ParentDNS []string `yaml:"-"`
-	Records   []Record `yaml:"records"`
+	Root    string   `yaml:"root"`
+	Parent  Parent   `yaml:"-"`
+	Records []Record `yaml:"records"`
 }
 
 func (z Zone) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
