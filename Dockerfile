@@ -1,4 +1,4 @@
-FROM golang:1.15.6-alpine AS builder
+FROM golang:1.21-alpine AS builder
 WORKDIR /app
 COPY . .
 RUN mkdir output &&\
@@ -6,7 +6,7 @@ RUN mkdir output &&\
     bins/upx output/esd &&\
     cp -r conf output/
 #
-FROM alpine:latest
+FROM alpine:3.18
 COPY --from=builder /app/output /data
 WORKDIR /data
 ENTRYPOINT ["/data/esd"]

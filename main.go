@@ -1,10 +1,10 @@
 package main
 
 import (
+	"flag"
+
 	"esd/internal"
 	"esd/resolver"
-	"flag"
-	"log"
 )
 
 var (
@@ -13,16 +13,16 @@ var (
 
 func main() {
 	flag.StringVar(&configFile, "config", configFile, "path to YAML config")
-	appConfig := internal.AppConfig{}
-	err := appConfig.Read(configFile)
+	config, err := internal.NewConfig(configFile)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
-	defaultZone := resolver.Zone{
+	defaultZone := &resolver.Zone{
+		Logger:  config.Logger,
 		Root:    ".",
-		Parent:  appConfig.Parent,
+		Parent:  config.Parent,
 		Records: nil,
 	}
-	appConfig.Zones = append(appConfig.Zones, defaultZone)
-	log.Println(resolver.Start(appConfig.Listen, appConfig.Protocol, appConfig.Zones))
+	config.Zones = append(config.Zones, defaultZone)
+	config.Logger.Info(resolver.Start(config.Listen, config.Protocol, config.Zones))
 }

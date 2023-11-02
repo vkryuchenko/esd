@@ -1,0 +1,14 @@
+root: "example.net"
+records:
+  - name: "example.net"
+    type: "NS"
+    pointTo:
+      - "127.0.0.1"
+  - name: "test2"
+    type: "A"
+    pointTo:
+      - "127.0.0.2"
+  - name: "aaaa.test3"
+    type: "A"
+    pointTo:
+      - "127.0.0.3"

@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func ResolvePath(filePath string) (string, error) {
+func resolvePath(filePath string) (string, error) {
 	userInfo, err := user.Current()
 	if err != nil {
 		return "", err

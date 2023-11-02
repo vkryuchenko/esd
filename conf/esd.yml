@@ -1,10 +1,13 @@
 listen: ":5335"
 protocol: "udp"
+logLevel: "debug"
 parent:
   timeout: 1
   servers:
     - "1.1.1.1:53"
     - "8.8.4.4:53"
+zoneFiles:
+  - "conf/example.net.yml"
 zones:
   - root: "example.com"
     records:
@@ -16,20 +19,6 @@ zones:
         type: "A"
         pointTo:
           - "127.0.0.2"
-      - name: "aaaa.test3"
-        type: "A"
-        pointTo:
-          - "127.0.0.3"
-  - root: "example.net"
-    records:
-      - name: "example.net"
-        type: "NS"
-        pointTo:
-          - "127.0.0.1"
-      - name: "test2"
-        type: "A"
-        pointTo:
-         - "127.0.0.2"
       - name: "aaaa.test3"
         type: "A"
         pointTo:

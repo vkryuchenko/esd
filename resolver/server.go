@@ -4,7 +4,7 @@ import (
 	"github.com/miekg/dns"
 )
 
-func Start(listen, protocol string, zones []Zone) error {
+func Start(listen, protocol string, zones []*Zone) error {
 	mux := dns.NewServeMux()
 	for _, zone := range zones {
 		mux.Handle(zone.Root, zone)

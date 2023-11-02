@@ -1,9 +1,10 @@
 package resolver
 
 import (
-	"github.com/miekg/dns"
-	"log"
 	"strings"
+
+	"github.com/miekg/dns"
+	"go.uber.org/zap"
 )
 
 type Parent struct {
@@ -18,31 +19,32 @@ type Record struct {
 }
 
 type Zone struct {
-	Root    string   `yaml:"root"`
-	Parent  Parent   `yaml:"-"`
-	Records []Record `yaml:"records"`
+	Logger  *zap.SugaredLogger `yaml:"-"`
+	Root    string             `yaml:"root"`
+	Parent  Parent             `yaml:"-"`
+	Records []Record           `yaml:"records"`
 }
 
-func (z Zone) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
+func (z *Zone) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	m := new(dns.Msg)
 	m.SetReply(r)
 	m.Compress = false
 
 	switch r.Opcode {
 	case dns.OpcodeQuery:
-		z.parseQuery(m)
+		z.parseQuery(m, w.RemoteAddr().String())
 	}
 
 	err := w.WriteMsg(m)
 	if err != nil {
-		log.Printf("Failed to write message:%s\n", err)
+		z.Logger.Errorf("failed to write message for %s: %s", w.RemoteAddr().String(), err)
 	}
 }
 
-func (z *Zone) parseQuery(m *dns.Msg) {
+func (z *Zone) parseQuery(m *dns.Msg, client string) {
 	for _, q := range m.Question {
 		questionType := dns.Type(q.Qtype).String()
-		log.Printf("Query %s for %s\n", questionType, q.Name)
+		z.Logger.Debugf("%s query for %s from %s", questionType, q.Name, client)
 		points := []string{}
 		for _, record := range z.Records {
 			if q.Name != record.Name {
@@ -56,7 +58,7 @@ func (z *Zone) parseQuery(m *dns.Msg) {
 			}
 		}
 		if len(points) > 0 {
-			log.Printf("Points found: %s\n", points)
+			z.Logger.Debugf("%s points for %s found: %s", questionType, q.Name, points)
 			for _, point := range points {
 				rr, err := dns.NewRR(strings.Join([]string{q.Name, questionType, point}, " "))
 				if err == nil {
@@ -64,7 +66,7 @@ func (z *Zone) parseQuery(m *dns.Msg) {
 				}
 			}
 		} else {
-			log.Println("Points not found")
+			z.Logger.Warnf("%s points not found for %s requested by %s", questionType, q.Name, client)
 			m.Answer = z.AskParent(q.Name, q.Qtype)
 		}
 	}
